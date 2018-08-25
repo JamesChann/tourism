@@ -16,6 +16,7 @@ export function getSliders() {
   })
 }
 
+// 城市信息
 export function getCitys() {
   const url = '/api/getCitys'
 
@@ -24,6 +25,27 @@ export function getCitys() {
       'Type': [11, 12],
       'ImageSize': 0,
       'saleChannel': 1
+    }
+  })
+
+  return axios.get(url, {
+    params: data
+  }).then((res) => {
+    return Promise.resolve(res.data)
+  })
+}
+
+// 首页信息
+export function getHomeInfo(cityId) {
+  const url = '/api/getHomeInfo'
+
+  const data = Object.assign({}, {
+    req: {
+      'currentCityId': '144',
+      'lat': 30.94486,
+      'lng': 117.81232,
+      'searchCityId': cityId,
+      'showNearby': false
     }
   })
 

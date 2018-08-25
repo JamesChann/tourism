@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from 'pages/home/home'
-import SelectCity from 'base/select-city/select-city'
+// import SelectCity from 'base/select-city/select-city'
+import City from 'pages/city/city'
 
 Vue.use(Router)
 
@@ -12,8 +13,8 @@ export default new Router({
       component: Home,
       children: [
         {
-          path: '/select-city',
-          component: SelectCity
+          path: '/city',
+          component: City
         }
       ]
     }

@@ -8,15 +8,25 @@
       <span class="input-city">输入城市景点/游玩主题</span>
     </div>
       <div class="header-right" @click="selectCity">
-        北京
+        {{ currentCity }}
         <i class="icon-drop arrow-icon"></i>
       </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'HomeHeader',
+  computed: {
+    currentCity() {
+      return this.cityName === '' ? '杭州' : this.cityName
+    },
+    ...mapGetters([
+      'cityName'
+    ])
+  },
   methods: {
     selectCity() {
       this.$emit('select')

@@ -1,6 +1,7 @@
 import 'babel-polyfill'
 import Vue from 'vue'
 import fastclick from 'fastclick'
+import store from './store'
 import {
   /* eslint-disable no-unused-vars */
   Style,
@@ -94,6 +95,7 @@ Vue.config.productionTip = false
 new Vue({
   el: '#app',
   router,
+  store,
   template: '<App/>',
   components: { App }
 })

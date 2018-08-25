@@ -10,44 +10,28 @@
           <div class="scroll-wrapper">
             <cube-scroll  ref="scroll" 
                           class="city-list" 
-                          :data="allCitys" 
+                          :data="allCitys"
                           :options="options"
                           :scroll-events="['scroll']"
                           @scroll="onScrollHandle" 
-                          @pulling-down="onPullingDown"
             >
-              <!--下拉刷新-->
-              <template slot="pulldown" slot-scope="props">
-                <div  v-if="props.pullDownRefresh"
-                      class="cube-pulldown-wrapper"
-                      :style="pullDownStyle"
-                >
-                  <div class="pulldown-content">
-                    <img src="http://om0jxp12h.bkt.clouddn.com/pulldow-img.jpg">
-                    <span v-if="props.beforePullDown">{{ pullDownTip }}</span>
-                    <template v-else>
-                      <span v-if="props.isPullingDown">正在更新...</span>
-                      <span v-else>更新成功</span>
-                    </template>
-                  </div>
-                </div>  
-              </template>
               <!--当前位置-->
               <div class="area">
-                <div class="tit">您的位置</div>
+                <div class="tit">所选城市</div>
                 <div class="cont">
                   <div class="cont-item">
-                    <div class="cont-item-box">杭州</div>
+                    <div class="cont-item-box">{{ currentCity }}</div>
                   </div>
                 </div>
               </div>
               <!--热门城市-->
-              <div class="area">
+              <div class="area" v-if="hotCitys.length">
                 <div class="tit">热门城市</div>
                 <div class="cont">
                   <div class="cont-item"
                       v-for="(hotcity, index) in item.hotcitys"
                       :key="index"
+                      @click="selectCity(hotcity)"
                   >
                     <div class="cont-item-box">
                       {{ hotcity.cityName }}
@@ -58,7 +42,7 @@
               <!--所有城市-->
               <div class="area" v-for="(allcity, index) of item.allcitys" :key="index" ref="listGroup">
                 <div class="tit">{{ allcity.key }}</div>
-                <div class="cont" v-for="(innerItem, index) of allcity.cityList" :key="index">
+                <div class="cont" v-for="(innerItem, index) of allcity.cityList" :key="index" @click="selectCity(innerItem)">
                     {{ innerItem.cityName }}
                 </div>
               </div>
@@ -66,6 +50,10 @@
           </div>
         </cube-tab-panel>
       </cube-tab-panels>
+    <!--loading-->
+    <div class="loading-container" v-show="!allCitys.length">
+      <loading></loading>
+    </div>
     <!--字母表-->
     <div class="list-shortcut"
          @touchstart="onShortcutTouchStart"
@@ -86,9 +74,18 @@
 
 <script>
 import { getData } from 'common/js/dom'
+import { mapGetters } from 'vuex'
+import Loading from 'base/loading/loading'
+
+const DOMESTIC = '国内城市'
+const OVERSEAS = '海外城市'
+const ANCHOR_HEIGHT = 18
 
 export default {
   name: 'ListView',
+  components: {
+    Loading
+  },
   props: {
     hotCitys: {
       type: Array,
@@ -109,40 +106,37 @@ export default {
   },
   data() {
     return {
-      options: {
-        pullDownRefresh: {
-          threshold: 60,
-          stop: 44,
-          txt: '更新成功'
-        }
-      },
-      pullDownStyle: '',
-      pullDownY: 0,
-      selectedLabel: '国内城市',
+      selectedLabel: DOMESTIC,
       tabs: [{
-        label: '国内城市',
+        label: DOMESTIC,
         hotcitys: [],
         allcitys: {}
       }, {
-        label: '海外城市',
+        label: OVERSEAS,
         hotcitys: [],
         allcitys: {}
       }],
       anchorList: [],
       flag: false,
-      labelFlag: ''
+      labelFlag: DOMESTIC,
+      scrollY: 0,
+      options: {
+        bounce: {
+          top: false,
+          bottom: false
+        },
+        click: true
+      }
     }
   },
   computed: {
-    pullDownTip() {
-      if (this.pullDownY <= 60) {
-        return '下拉刷新...'
-      } else if (this.pullDownY <= 90) {
-        return '继续下拉有惊喜！'
-      } else {
-        return '松开手有惊喜！'
-      }
-    }
+    currentCity() {
+      return this.cityName === '' ? '杭州' : this.cityName
+    },
+    ...mapGetters([
+      'cityId',
+      'cityName'
+    ])
   },
   watch: {
     hotCitys(newVal) {
@@ -165,19 +159,16 @@ export default {
   methods: {
     clickHandler (label) {
       this.labelFlag = label
-      this.anchorList = label === '国内城市' ? this.allCitys : this.allSug
+      this.anchorList = this.label === DOMESTIC ? this.allCitys : this.allSug
     },
-    onPullingDown() {
-      console.log(this.$refs.scroll[0])
-      setTimeout(() => {
-        this.$refs.scroll[0].forceUpdate()
-      }, 1000)
+    selectCity(city) {
+      this.$emit('select', city)
+      this.$router.push({
+        path: '/'
+      })
     },
     onScrollHandle(pos) {
-      this.pullDownY = pos.y
-      if (pos.y > 0) {
-        this.pullDownStyle = `top:${pos.y}px`
-      }
+      this.scrollY = pos.y
     },
     onShortcutTouchStart(e) {
       let anchorIndex = getData(e.target, 'index')
@@ -186,14 +177,21 @@ export default {
       this.touch.anchorIndex = anchorIndex
       this._scrollTo(anchorIndex)
     },
+    onShortcutTouchMove(e) {
+      let firstTouch = e.touches[0]
+      this.touch.y2 = firstTouch.pageY
+      let delta = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0
+      let anchorIndex = parseInt(this.touch.anchorIndex) + delta
+      this._scrollTo(anchorIndex)
+    },
     _scrollTo(index) {
-      console.log(this.labelFlag)
       if (this.labelFlag === '') {
         this.$refs.scroll[0].scrollToElement(this.$refs.listGroup[index], 0)
-      } else if (this.labelFlag === '国内城市') {
+      } else if (this.labelFlag === DOMESTIC) {
         this.$refs.scroll[0].scrollToElement(this.$refs.listGroup[index], 0)
-      } else if (this.labelFlag === '海外城市') {
-        this.$refs.scroll[1].scrollToElement(this.$refs.listGroup[index], 0)
+      } else if (this.labelFlag === OVERSEAS) {
+        let overseas = parseInt(index) + 22
+        this.$refs.scroll[1].scrollToElement(this.$refs.listGroup[overseas], 0)
       }
     }
   }
@@ -263,21 +261,18 @@ export default {
                     text-align center
                     border 1px solid #ccc
                     border-radius .1rem
-          .cube-pulldown-wrapper
-            transform: translateY(-100%)
-            line-height: 0
-            .pulldown-content
-              width: 100%
-              span
-                position: absolute
-                bottom: 15px
-                left: 0
-                right: 0
-                margin: auto
-                width: 200px
-                text-align: center
-                color: #eee
-                font-size: 14px
+            .fix-title-cont
+              position: absolute
+              top: 0
+              left: 0
+              right: 0
+              .fix-title
+                height: 30px
+                line-height: 30px
+                padding-left: 20px
+                color: $color-text-l
+                background: $color-highlight-background
+                font-size: $font-size-small
   .list-shortcut
     position: fixed
     right: 0
@@ -294,4 +289,9 @@ export default {
       font-size: $font-size-small-s
       &.current
         color: $color-theme
+  .loading-container
+    position: absolute
+    width: 100%
+    top: 50%
+    transform: translateY(-50%)
 </style>

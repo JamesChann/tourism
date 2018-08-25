@@ -42,7 +42,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
         })
       })
       
-      // 获取国内城市
+      // 获取城市信息
       app.get('/api/getCitys', function (req, res) {
         const url = 'http://m.elong.com/scenery/search/getcitydata'
         axios.get(url, {
@@ -58,12 +58,12 @@ const devWebpackConfig = merge(baseWebpackConfig, {
         })
       })
 
-      // 获取国外城市
-      app.get('/api/getForeign', function (req, res) {
-        const url = 'https://m.elong.com/ihotel/ajax/hotSug/'
+      // 获取首页信息
+      app.get('/api/getHomeInfo', function(req, res) {
+        const url = 'http://m.elong.com/scenery/search/gethomepagedata'
         axios.get(url, {
           headers: {
-            referer: 'http://m.elong.com/',
+            referer: 'http://m.elong.com',
             host: 'm.elong.com'
           },
           params: req.query
@@ -73,6 +73,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           console.log(e)
         })
       })
+      
     },
     clientLogLevel: 'warning',
     historyApiFallback: true,
