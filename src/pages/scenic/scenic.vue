@@ -87,7 +87,6 @@ export default {
       getScenic(scenicId).then((res) => {
         if (res.IsError === false) {
           this.scenic = res
-          console.log(this.scenic)
         }
       })
     }
