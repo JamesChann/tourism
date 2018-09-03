@@ -73,6 +73,54 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           console.log(e)
         })
       })
+
+      // 获取主题景点
+      app.get('/api/getTopic', function(req, res) {
+        const url = 'http://m.elong.com/scenery/search/getsearchlist'
+        axios.get(url, {
+          headers: {
+            referer: 'http://m.elong.com',
+            host: 'm.elong.com'
+          },
+          params: req.query
+        }).then((response) => {
+          res.json(response.data)
+        }).catch((e) => {
+          console.log(e)
+        })
+      })
+
+      // 获取景点详情
+      app.get('/api/getScenic', function(req, res) {
+        const url = 'http://m.elong.com/scenery/search/getsearchdetail'
+        axios.get(url, {
+          headers: {
+            referer: 'http://m.elong.com',
+            host: 'm.elong.com'
+          },
+          params: req.query
+        }).then((response) => {
+          res.json(response.data)
+        }).catch((e) => {
+          console.log(e)
+        })
+      })
+
+      // 得到评论信息
+      app.get('/api/getCommit', function(req, res) {
+        const url = 'http://m.elong.com/scenery/comment/getcommentlist'
+        axios.get(url, {
+          headers: {
+            referer: 'http://m.elong.com',
+            host: 'm.elong.com'
+          },
+          params: req.query
+        }).then((response) => {
+          res.json(response.data)
+        }).catch((e) => {
+          console.log(e)
+        })
+      })
       
     },
     clientLogLevel: 'warning',

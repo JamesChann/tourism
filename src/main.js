@@ -1,6 +1,8 @@
 import 'babel-polyfill'
 import Vue from 'vue'
 import fastclick from 'fastclick'
+import VueLazyload from 'vue-lazyload'
+import AMap from 'vue-amap'
 import store from './store'
 import {
   /* eslint-disable no-unused-vars */
@@ -48,7 +50,8 @@ import {
 } from 'cube-ui'
 import App from './App'
 import router from './router'
-import 'common/stylus/index.styl'
+import 'common/stylus/index.sass'
+import 'common/stylus/border.styl'
 
 Vue.use(Button)
 Vue.use(Loading)
@@ -88,6 +91,17 @@ Vue.use(ScrollNav)
 Vue.use(ScrollNavBar)
 
 fastclick.attach(document.body)
+Vue.use(VueLazyload, {
+  preLoad: 1.3,
+  loading: require('common/images/default.png')
+})
+
+Vue.use(AMap)
+
+AMap.initAMapApiLoader({
+  key: '270ec55bbb2e608a614f00c11fcb4b7a',
+  plugin: ['AMap.Geolocation', 'ToolBar', 'MapType', 'OverView', 'Scale']
+})
 
 Vue.config.productionTip = false
 

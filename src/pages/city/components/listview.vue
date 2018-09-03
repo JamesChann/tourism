@@ -199,7 +199,7 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-@import '~common/stylus/variable'
+@import '~common/stylus/variable.styl'
 
 .listview >>> .cube-tab-bar
   background: $color-background

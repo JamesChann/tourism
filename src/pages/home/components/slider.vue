@@ -25,7 +25,7 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-@import '~common/stylus/variable'
+@import '~common/stylus/variable.styl'
 
 .home-slider >>> .cube-slide-dots
   bottom: 10px

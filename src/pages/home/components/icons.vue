@@ -3,7 +3,7 @@
     <div class="scroll-list-wrap">
       <cube-slide ref="scroll" :data="iconList" :loop="false" :showDots="false" :autoPlay="false">
         <cube-slide-item v-for="(page, index) in pages" :key="index">
-          <div class="icon" v-for="item of page">
+          <div class="icon" v-for="item of page" @click="selectIcon(item)">
             <div class="icon-item">
               <img class="icon-img" :src="item.topicUrl">
             </div>
@@ -36,17 +36,22 @@ export default {
       })
       return pages
     }
+  },
+  methods: {
+    selectIcon(topic) {
+      this.$emit('select', topic)
+    }
   }
 }
 </script>
 
 <style lang="stylus" scoped>
 @import '~common/stylus/variable'
-@import '~common/stylus/mixin'
 
 .home-icons
   overflow: hidden
   background: $color-background
+  max-height: 3.4rem
   .scroll-list-wrap
     height: 100%
     .icon
